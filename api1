@@ -1,0 +1,44 @@
+import os
+import sys
+
+import requests
+from PIL.ImageTk import getimage
+from PyQt6 import uic
+from PyQt6.QtGui import QPixmap
+from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QMainWindow
+
+
+class Example(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi('yandex_maps.ui', self)
+        self.Search_button.clicked.connect(self.getImage)
+
+
+
+    def getImage(self):
+        server_address = 'https://static-maps.yandex.ru/v1?'
+        api_key = '8013b162-6b42-4997-9691-77b7074026e0'
+        geocode = f'{self.textEdit.toPlainText()}'
+
+        map_request = f"{server_address}&apikey={api_key}&geocode={geocode}&format=json"
+        response = requests.get(map_request)
+
+        if not response:
+            print("Ошибка выполнения запроса:")
+            print(map_request)
+            print("Http статус:", response.status_code, "(", response.reason, ")")
+            sys.exit(1)
+
+
+        self.pixmap = QPixmap("map.png")
+        self.label_3.setPixmap(self.pixmap)
+
+
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = Example()
+    ex.show()
+    sys.exit(app.exec())
